@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_this_password_in_production}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always
+
+  app:
+    environment:
+      # Override for production
+      APP_ENV: production
+      LOG_LEVEL: warn
+      JWT_SECRET: ${JWT_SECRET:-change_this_secret_in_production}
+      DB_PASSWORD: ${DB_PASSWORD:-change_this_password_in_production}
+    restart: always
+    # Uncomment for production with reverse proxy
+    # ports: []
+    # expose:
+    #   - "8080"
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: request_management_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - request_management_network
+    restart: always
+    profiles:
+      - nginx
+
+volumes:
+  postgres_prod_data:
+    driver: local
+

@@ -1,0 +1,1890 @@
+definitions:
+  models.APIError:
+    properties:
+      code:
+        type: string
+      details:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+    type: object
+  models.APIResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/models.APIError'
+      message:
+        type: string
+      success:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  models.ApproveRequestRequest:
+    properties:
+      approved_by_staff_id:
+        type: integer
+    required:
+    - approved_by_staff_id
+    type: object
+  models.Branch:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      updated_at:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  models.BranchResponse:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.ChangePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        maxLength: 100
+        minLength: 6
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  models.Company:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      updated_at:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  models.CompanyResponse:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.CreateBranchRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  models.CreateCompanyRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  models.CreateRequestRequest:
+    type: object
+  models.CreateUserRequest:
+    properties:
+      branch_id:
+        type: integer
+      company_id:
+        type: integer
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        maxLength: 100
+        minLength: 6
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    - username
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserResponse'
+    type: object
+  models.NullString:
+    type: object
+  models.RegisterRequest:
+    properties:
+      company_id:
+        type: integer
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        maxLength: 100
+        minLength: 6
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    - username
+    type: object
+  models.Request:
+    properties:
+      approved_at:
+        type: string
+      approved_by:
+        type: integer
+      approved_by_user:
+        $ref: '#/definitions/models.User'
+      branch_id:
+        type: integer
+      client:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships (populated when needed)
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      created_by_user:
+        $ref: '#/definitions/models.User'
+      description:
+        minLength: 10
+        type: string
+      exporter_name:
+        type: string
+      id:
+        type: integer
+      rejected_at:
+        type: string
+      rejection_reason:
+        type: string
+      request_detail_id:
+        items:
+          $ref: '#/definitions/models.RequestDetail'
+        type: array
+      request_details:
+        items:
+          $ref: '#/definitions/models.RequestDetail'
+        type: array
+      request_type_id:
+        type: integer
+      serial_number:
+        type: string
+      status:
+        $ref: '#/definitions/models.RequestStatus'
+      title:
+        maxLength: 255
+        minLength: 5
+        type: string
+      updated_at:
+        type: string
+    required:
+    - description
+    - title
+    type: object
+  models.RequestDetail:
+    properties:
+      activity_type:
+        $ref: '#/definitions/models.NullString'
+      address:
+        $ref: '#/definitions/models.NullString'
+      client:
+        $ref: '#/definitions/models.User'
+      client_id:
+        type: integer
+      client_name:
+        $ref: '#/definitions/models.NullString'
+      commerical_number:
+        $ref: '#/definitions/models.NullString'
+      company_name:
+        $ref: '#/definitions/models.NullString'
+      company_name_en:
+        $ref: '#/definitions/models.NullString'
+      created_at:
+        type: string
+      description:
+        $ref: '#/definitions/models.NullString'
+      email:
+        $ref: '#/definitions/models.NullString'
+      id:
+        type: integer
+      identity_number:
+        $ref: '#/definitions/models.NullString'
+      invoice_date:
+        type: string
+      invoice_number:
+        $ref: '#/definitions/models.NullString'
+      item_cost:
+        type: number
+      mobile_number:
+        $ref: '#/definitions/models.NullString'
+      net_weight:
+        type: number
+      number_of_parcel:
+        type: integer
+      phone_number:
+        $ref: '#/definitions/models.NullString'
+      quantity:
+        type: integer
+      request:
+        allOf:
+        - $ref: '#/definitions/models.Request'
+        description: Relationships (populated when needed)
+      request_id:
+        type: integer
+      signs:
+        $ref: '#/definitions/models.NullString'
+      transfer_detail:
+        $ref: '#/definitions/models.NullString'
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
+      weight:
+        type: number
+    type: object
+  models.RequestDetailDto:
+    type: object
+  models.RequestHistory:
+    properties:
+      change_reason:
+        type: string
+      changed_by_user:
+        $ref: '#/definitions/models.User'
+      changed_by_user_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      new_status:
+        $ref: '#/definitions/models.RequestStatus'
+      old_status:
+        $ref: '#/definitions/models.RequestStatus'
+      request:
+        allOf:
+        - $ref: '#/definitions/models.Request'
+        description: Relationships
+      request_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.RequestResponse:
+    properties:
+      approved_at:
+        type: string
+      approved_by_staff:
+        $ref: '#/definitions/models.UserResponse'
+      approved_by_user_id:
+        type: integer
+      client:
+        $ref: '#/definitions/models.UserResponse'
+      create_by_user_id:
+        type: integer
+      created_at:
+        type: string
+      created_by_staff:
+        $ref: '#/definitions/models.UserResponse'
+      description:
+        type: string
+      id:
+        type: integer
+      rejected_at:
+        type: string
+      rejection_reason:
+        type: string
+      request_details:
+        items:
+          $ref: '#/definitions/models.RequestDetailDto'
+        type: array
+      request_type_id:
+        type: integer
+      serial_number:
+        type: string
+      status:
+        $ref: '#/definitions/models.RequestStatus'
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.RequestStatus:
+    enum:
+    - ISSUED
+    - APPROVED
+    - REJECTED
+    - PAID
+    type: string
+    x-enum-varnames:
+    - StatusSubmitted
+    - StatusApproved
+    - StatusRejected
+    - StatusPaid
+  models.RequestTypeResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      name_en:
+        $ref: '#/definitions/models.NullString'
+      price:
+        type: number
+    type: object
+  models.UpdateBranchRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    type: object
+  models.UpdateCompanyRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    type: object
+  models.UpdateRequestRequest:
+    properties:
+      description:
+        minLength: 10
+        type: string
+      title:
+        maxLength: 255
+        minLength: 5
+        type: string
+    type: object
+  models.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    type: object
+  models.UpdateUserRoleRequest:
+    properties:
+      branch_id:
+        type: integer
+      company_id:
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        $ref: '#/definitions/models.UserRole'
+    required:
+    - role
+    type: object
+  models.User:
+    properties:
+      branch:
+        $ref: '#/definitions/models.Branch'
+      branch_id:
+        type: integer
+      company:
+        allOf:
+        - $ref: '#/definitions/models.Company'
+        description: Relationships (populated when needed)
+      company_id:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      last_login:
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+      updated_at:
+        type: string
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - role
+    - username
+    type: object
+  models.UserResponse:
+    properties:
+      branch:
+        $ref: '#/definitions/models.Branch'
+      branch_id:
+        type: integer
+      company:
+        $ref: '#/definitions/models.Company'
+      created_at:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      first_name:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      last_login:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+      username:
+        type: string
+    type: object
+  models.UserRole:
+    enum:
+    - client
+    - staff
+    - admin
+    - accountant
+    - auditor
+    type: string
+    x-enum-varnames:
+    - RoleClient
+    - RoleStaff
+    - RoleAdmin
+    - RoleAccountant
+    - RoleAuditor
+info:
+  contact: {}
+paths:
+  /admin/branches:
+    post:
+      consumes:
+      - application/json
+      description: Create a new branch (admin only)
+      parameters:
+      - description: Create branch request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateBranchRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.BranchResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new branch
+      tags:
+      - admin
+  /admin/branches/{id}:
+    delete:
+      description: Delete a branch (admin only)
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a branch
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Update a branch (admin only)
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update branch request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateBranchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.BranchResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a branch
+      tags:
+      - admin
+  /admin/companies:
+    post:
+      consumes:
+      - application/json
+      description: Create a new company (admin only)
+      parameters:
+      - description: Create company request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CompanyResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new company
+      tags:
+      - admin
+  /admin/companies/{id}:
+    delete:
+      description: Delete a company (admin only)
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a company
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Update a company (admin only)
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update company request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CompanyResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a company
+      tags:
+      - admin
+  /admin/requests/{id}:
+    delete:
+      description: Delete a request (admin only, only pending requests)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a request
+      tags:
+      - admin
+  /admin/users:
+    get:
+      description: List users with pagination and filtering (admin only)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Filter by role
+        in: query
+        name: role
+        type: string
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      - description: Filter by branch ID
+        in: query
+        name: branch_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new user (admin only)
+      parameters:
+      - description: Create user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - admin
+  /admin/users/{id}:
+    delete:
+      description: Delete a user (admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - admin
+    get:
+      description: Get a user by ID (admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - admin
+  /admin/users/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Update a user's role and assignments (admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update user role request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user role
+      tags:
+      - admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new client user
+      parameters:
+      - description: Registration request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /branches:
+    get:
+      description: List branches with pagination and filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: List branches
+      tags:
+      - branches
+  /branches/{id}:
+    get:
+      description: Get a branch by ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.BranchResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get branch by ID
+      tags:
+      - branches
+  /branches/all:
+    get:
+      description: Get all branches for dropdown lists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.BranchResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all branches
+      tags:
+      - branches
+  /companies:
+    get:
+      description: List companies with pagination and filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: List companies
+      tags:
+      - companies
+  /companies/{id}:
+    get:
+      description: Get a company by ID
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CompanyResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get company by ID
+      tags:
+      - companies
+  /companies/all:
+    get:
+      description: Get all companies for dropdown lists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CompanyResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all companies
+      tags:
+      - companies
+  /request-types:
+    get:
+      description: List request types with pagination and filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Sort by field (name, price, created_at)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: List request types
+      tags:
+      - request-types
+  /request-types/all:
+    get:
+      description: Get all request types for dropdown lists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.RequestTypeResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all request types
+      tags:
+      - request-types
+  /requests:
+    get:
+      description: List requests with pagination and filtering (clients see only their
+        own, staff/admin see all)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: Filter by end date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: List requests
+      tags:
+      - requests
+    post:
+      consumes:
+      - application/json
+      description: Create a new request (clients create for themselves, staff can
+        create for clients)
+      parameters:
+      - description: Create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RequestResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new request
+      tags:
+      - requests
+  /requests/{id}:
+    get:
+      description: Get a request by ID (clients can only see their own, staff/admin
+        can see all)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RequestResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get request by ID
+      tags:
+      - requests
+    put:
+      consumes:
+      - application/json
+      description: Update a request (only pending requests can be updated)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RequestResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a request
+      tags:
+      - requests
+  /requests/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve a request and generate serial number (staff/admin only)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approve request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ApproveRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RequestResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Approve a request
+      tags:
+      - requests
+  /requests/{id}/history:
+    get:
+      description: Get the history of status changes for a request
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.RequestHistory'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get request history
+      tags:
+      - requests
+  /users/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change the password of the currently authenticated user
+      parameters:
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - users
+  /users/profile:
+    get:
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update the profile of the currently authenticated user
+      parameters:
+      - description: Update user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user profile
+      tags:
+      - users
+swagger: "2.0"

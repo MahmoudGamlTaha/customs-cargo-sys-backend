@@ -1,0 +1,4 @@
+
+go get github.com/gin-gonic/gin@v1.9.1
+go tidy 
+go install -v github.com/go-delve/delve/cmd/dlv@latest
