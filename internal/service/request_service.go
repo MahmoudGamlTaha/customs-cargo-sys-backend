@@ -3,6 +3,7 @@ package service
 import (
 	"Chumber-Workflow-System/internal/models"
 	"Chumber-Workflow-System/internal/repository"
+	"Chumber-Workflow-System/pkg/client"
 	"Chumber-Workflow-System/pkg/crypto"
 	"database/sql"
 	"errors"
@@ -15,6 +16,7 @@ type RequestService struct {
 	requestRepo     *repository.RequestRepository
 	userRepo        *repository.UserRepository
 	requestTypeRepo *repository.RequestTypeRepository
+	requestClient   *client.RequestClient
 }
 
 // NewRequestService creates a new request service
@@ -27,6 +29,7 @@ func NewRequestService(
 		requestRepo:     requestRepo,
 		userRepo:        userRepo,
 		requestTypeRepo: requestTypeRepo,
+		requestClient:   client.NewRequestClient(),
 	}
 }
 
@@ -630,20 +633,12 @@ func (s *RequestService) canEditRequest(request *models.Request, userID int64, u
 	}
 }
 
-// GetRequestBySerial retrieves a request by its serial number (public access for approved requests only)
+// GetRequestBySerial retrieves a request by its serial number from external API
 func (s *RequestService) GetRequestBySerial(serialNumber string) (*models.Request, error) {
-	// Get request by serial number
-	request, err := s.requestRepo.GetBySerial(serialNumber)
+	// Fetch request from external API
+	request, err := s.requestClient.GetRequestBySerial(serialNumber)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("request not found")
-		}
 		return nil, err
-	}
-
-	// Check if request is approved (both approved_at and approved_by_user_id must not be null)
-	if request.ApprovedAt == nil || request.ApprovedByUserID == nil {
-		return nil, errors.New("request not approved")
 	}
 
 	return request, nil
