@@ -223,6 +223,29 @@ func (h *RequestHandler) GetRequestBySerial(c *gin.Context) {
 		return
 	}
 
+
+    // Enrich and record user activity if possible (this is a public endpoint)
+    var actorUserID int64
+    actorUsername := "guest"
+    branchSuffix := ""
+    if uid, ok := c.Get("user_id"); ok {
+        if v, ok2 := uid.(int64); ok2 {
+            actorUserID = v
+        }
+    }
+    if uname, ok := c.Get("username"); ok {
+        if v, ok2 := uname.(string); ok2 && v != "" {
+            actorUsername = v
+        }
+    }
+    if bid, ok := c.Get("branch_id"); ok {
+        if v, ok2 := bid.(int64); ok2 && v > 0 {
+            branchSuffix = fmt.Sprintf(" ???? ??? %d", v)
+        }
+    }
+
+    h.trackUserActivity(actorUserID, actorUsername, "get", "request", request.ID, fmt.Sprintf("??? ???????? %s ?????????? ?? ????? ???????? %s%s", actorUsername, serialNumber, branchSuffix))
+
 	c.JSON(http.StatusOK, models.SuccessResponse("Request retrieved", request.ToResponse()))
 }
 

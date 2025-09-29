@@ -141,8 +141,10 @@ func setupRouter(
 	}
 
 	// Public request routes (no authentication required)
-	v1.GET("/request/:identifier", requestHandler.GetRequestByIdentifier)
-	v1.GET("/request/serial/:serial", requestHandler.GetRequestBySerial)
+	publicReq := v1.Group("")
+	publicReq.Use(middleware.OptionalAuth(jwtManager))
+	publicReq.GET("/request/:identifier", requestHandler.GetRequestByIdentifier)
+	publicReq.GET("/request/serial/:serial", requestHandler.GetRequestBySerial)
 
 	// Protected routes (authentication required)
 	protected := v1.Group("")
@@ -199,6 +201,7 @@ func setupRouter(
 	{
 		userActivities.GET("", userActivityHandler.GetAllActivities)
 		userActivities.GET("/user/:user_id", userActivityHandler.GetActivitiesByUserID)
+		userActivities.GET("/branch/:branch_id", userActivityHandler.GetActivitiesByBranchID)
 		userActivities.GET("/module/:module/entity/:entity_id", userActivityHandler.GetActivitiesByModuleAndEntityID)
 	}
 
