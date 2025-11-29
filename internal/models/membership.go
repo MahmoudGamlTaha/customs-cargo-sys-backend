@@ -73,18 +73,22 @@ func (d *Date) Scan(value interface{}) error {
 
 type Memberships struct {
 	BaseModel
-	Description    *string       `json:"description" db:"description"`
-	Status         RequestStatus `json:"status" db:"status"`
-	CreatedBy      int64         `json:"created_by" db:"created_by"`
-	BranchId       *int64        `json:"branch_id" db:"branch_id"`
-	BranchName     NullString    `json:"branch_name" db:"branch_name"`
-	AppDate        *Date         `json:"app_date" db:"app_date"`
-	AppNumber      NullString    `json:"app_number" db:"app_number"`
-	CancelReason   NullString    `json:"cancel_reason" db:"cancel_reason"`
-	RejectReason   NullString    `json:"reject_reason" db:"reject_reason"`
-	SerialNumber   NullString    `json:"serial_number" db:"serial_number"`
-	CreateDate     *Date         `json:"create_date" db:"create_date"`
-	ExpirationDate *Date         `json:"expiration_date" db:"expiration_date"`
+	Description      *string                `json:"description" db:"description"`
+	Status           RequestStatus          `json:"status" db:"status"`
+	CreatedBy        int64                  `json:"created_by" db:"created_by"`
+	BranchId         *int64                 `json:"branch_id" db:"branch_id"`
+	BranchName       NullString             `json:"branch_name" db:"branch_name"`
+	AppDate          *Date                  `json:"app_date" db:"app_date"`
+	AppNumber        NullString             `json:"app_number" db:"app_number"`
+	CancelReason     NullString             `json:"cancel_reason" db:"cancel_reason"`
+	RejectReason     NullString             `json:"reject_reason" db:"reject_reason"`
+	SerialNumber     NullString             `json:"serial_number" db:"serial_number"`
+	CreateDate       *Date                  `json:"create_date" db:"create_date"`
+	ExpirationDate   *Date                  `json:"expiration_date" db:"expiration_date"`
+	TotalInvoice     *float64               `json:"total_invoice" db:"total_invoice"`
+	TotalCollected   *float64               `json:"total_collected" db:"total_collected"`
+	AttachedFilePath *string                `json:"attached_file_path" db:"attached_file_path"`
+	Details          []MembershipDetailsDto `json:"details" db:"details"`
 }
 
 type MembershipDetails struct {
@@ -107,24 +111,28 @@ type MembershipDetailsDto struct {
 	Address        *string `json:"address"`
 	GovShape       *string `json:"gov_shape"`
 	TypeName       *string `json:"type_name"`
+	Extra          *string `json:"extra"`
 }
 
 type MembershipsDTO struct {
 	BaseModelDto
-	Description    *string                 `json:"description"`
-	Status         RequestStatus           `json:"status"`
-	CreatedBy      int64                   `json:"created_by"`
-	BranchId       *int64                  `json:"branch_id"`
-	BranchName     NullString              `json:"branch_name"`
-	AppDate        *Date                   `json:"app_date"`
-	AppNumber      NullString              `json:"app_number"`
-	CancelReason   NullString              `json:"cancel_reason"`
-	RejectReason   NullString              `json:"reject_reason"`
-	SerialNumber   NullString              `json:"serial_number"`
-	CreateDate     *Date                   `json:"create_date"`
-	ExpirationDate *Date                   `json:"expiration_date"`
-	IsExpired      bool                    `json:"is_expired"`
-	Details        []*MembershipDetailsDto `json:"details"`
+	Description      *string                 `json:"description"`
+	Status           RequestStatus           `json:"status"`
+	CreatedBy        int64                   `json:"created_by"`
+	BranchId         *int64                  `json:"branch_id"`
+	BranchName       NullString              `json:"branch_name"`
+	AppDate          *Date                   `json:"app_date"`
+	AppNumber        NullString              `json:"app_number"`
+	CancelReason     NullString              `json:"cancel_reason"`
+	RejectReason     NullString              `json:"reject_reason"`
+	SerialNumber     NullString              `json:"serial_number"`
+	CreateDate       *Date                   `json:"create_date"`
+	ExpirationDate   *Date                   `json:"expiration_date"`
+	TotalInvoice     *float64                `json:"total_invoice"`
+	TotalCollected   *float64                `json:"total_collected"`
+	AttachedFilePath *string                 `json:"attached_file_path"`
+	IsExpired        bool                    `json:"is_expired"`
+	Details          []*MembershipDetailsDto `json:"details"`
 }
 
 type RenewMembership struct {

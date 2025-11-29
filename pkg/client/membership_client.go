@@ -53,7 +53,7 @@ func NewMembershipClient() *MembershipClient {
 // GetMembershipByID fetches a membership by ID from the external API
 func (c *MembershipClient) GetMembershipByID(membershipID int64) (*models.Memberships, error) {
 	// Construct the API endpoint URL
-	url := fmt.Sprintf("%s/api/v1/membership/check/%d", c.baseURL, membershipID)
+	url := fmt.Sprintf("%s/api/v1/membership/check/%d?with_details=true", c.baseURL, membershipID)
 
 	// Make HTTP GET request
 	resp, err := c.httpClient.Get(url)
