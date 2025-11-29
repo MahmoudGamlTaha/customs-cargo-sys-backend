@@ -16,6 +16,8 @@ type RequestService struct {
 	requestRepo     *repository.RequestRepository
 	userRepo        *repository.UserRepository
 	requestTypeRepo *repository.RequestTypeRepository
+	activityRepo    *repository.UserActivityRepository
+	branchRepo      *repository.BranchRepository
 	requestClient   *client.RequestClient
 }
 
@@ -24,11 +26,15 @@ func NewRequestService(
 	requestRepo *repository.RequestRepository,
 	userRepo *repository.UserRepository,
 	requestTypeRepo *repository.RequestTypeRepository,
+	activityRepo *repository.UserActivityRepository,
+	branchRepo *repository.BranchRepository,
 ) *RequestService {
 	return &RequestService{
 		requestRepo:     requestRepo,
 		userRepo:        userRepo,
 		requestTypeRepo: requestTypeRepo,
+		activityRepo:    activityRepo,
+		branchRepo:      branchRepo,
 		requestClient:   client.NewRequestClient(),
 	}
 }
@@ -634,7 +640,7 @@ func (s *RequestService) canEditRequest(request *models.Request, userID int64, u
 }
 
 // GetRequestBySerial retrieves a request by its serial number from external API
-func (s *RequestService) GetRequestBySerial(serialNumber string) (*models.Request, error) {
+func (s *RequestService) GetRequestBySerial(serialNumber string, userID int64, username string, branchID int64) (*models.Request, error) {
 	// Fetch request from external API
 	request, err := s.requestClient.GetRequestBySerial(serialNumber)
 	if err != nil {
@@ -642,19 +648,4 @@ func (s *RequestService) GetRequestBySerial(serialNumber string) (*models.Reques
 	}
 
 	return request, nil
-}
-
-// GetRatioSumWithBranchFilter returns the sum of ratios with optional branch filtering (admin only)
-func (s *RequestService) GetRatioSumWithBranchFilter(branchID *int64) (float64, error) {
-	if branchID != nil {
-		// Filter by specific branch
-		return s.requestRepo.SumRequestRatiosByBranch(*branchID)
-	}
-	// No branch filter - return sum of all request ratios
-	return s.requestRepo.SumAllRequestRatios()
-}
-
-// GetRatioSumPerBranch returns the sum of ratios grouped by branch name (admin only)
-func (s *RequestService) GetRatioSumPerBranch() ([]map[string]interface{}, error) {
-	return s.requestRepo.SumRatiosPerBranch()
 }

@@ -48,7 +48,7 @@ func main() {
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, companyRepo, branchRepo, roleRepo, passwordManager, jwtManager)
-	requestService := service.NewRequestService(requestRepo, userRepo, requestTypeRepo)
+	requestService := service.NewRequestService(requestRepo, userRepo, requestTypeRepo, userActivityRepo, branchRepo)
 	companyService := service.NewCompanyService(companyRepo)
 	branchService := service.NewBranchService(branchRepo)
 	requestTypeService := service.NewRequestTypeService(requestTypeRepo)
@@ -57,7 +57,7 @@ func main() {
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
-	requestHandler := handler.NewRequestHandler(requestService, userActivityRepo, *cfg)
+	requestHandler := handler.NewRequestHandler(requestService, userActivityRepo, *cfg, branchRepo)
 	companyHandler := handler.NewCompanyHandler(companyService)
 	branchHandler := handler.NewBranchHandler(branchService)
 	requestTypeHandler := handler.NewRequestTypeHandler(requestTypeService)
@@ -201,7 +201,6 @@ func setupRouter(
 	{
 		userActivities.GET("", userActivityHandler.GetAllActivities)
 		userActivities.GET("/user/:user_id", userActivityHandler.GetActivitiesByUserID)
-		userActivities.GET("/branch/:branch_id", userActivityHandler.GetActivitiesByBranchID)
 		userActivities.GET("/module/:module/entity/:entity_id", userActivityHandler.GetActivitiesByModuleAndEntityID)
 	}
 

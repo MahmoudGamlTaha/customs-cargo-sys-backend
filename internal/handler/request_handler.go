@@ -22,15 +22,17 @@ type RequestHandler struct {
 	activityRepo   *repository.UserActivityRepository
 	validator      *validator.Validate
 	config         *config.Config
+	branchRepo     *repository.BranchRepository
 }
 
 // NewRequestHandler creates a new request handler
-func NewRequestHandler(requestService *service.RequestService, activityRepo *repository.UserActivityRepository, cfg config.Config) *RequestHandler {
+func NewRequestHandler(requestService *service.RequestService, activityRepo *repository.UserActivityRepository, cfg config.Config, branchRepo *repository.BranchRepository) *RequestHandler {
 	return &RequestHandler{
 		requestService: requestService,
 		activityRepo:   activityRepo,
 		validator:      validator.New(),
 		config:         &cfg,
+		branchRepo:     branchRepo,
 	}
 }
 
@@ -83,8 +85,9 @@ func (h *RequestHandler) CreateRequest(c *gin.Context) {
 		return
 	}
 
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
 	// Track user activity in a background goroutine
-	h.trackUserActivity(userID, username, "create", "request", request.ID, fmt.Sprintf("قام الموظف %s بانشاء طلب جديد رقم %d", username, request.ID))
+	h.trackUserActivity(userID, username, "create", "request", request.ID, "", fmt.Sprintf("قام الموظف %s بانشاء طلب جديد رقم %d", username, request.ID), branchID, "")
 
 	c.JSON(http.StatusCreated, models.SuccessResponse("Request created successfully", request.ToResponse()))
 }
@@ -110,7 +113,8 @@ func (h *RequestHandler) AcceptRequest(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
 		return
 	}
-	h.trackUserActivity(currentUserID, "", "accept", "request", requestID, fmt.Sprintf("%sقام الموظف %d بالقبول عن الطلب رقم %d", username, currentUserID, requestID))
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
+	h.trackUserActivity(currentUserID, username, "accept", "request", requestID, "", fmt.Sprintf("قام الموظف %s بالقبول عن الطلب رقم %d", username, currentUserID, requestID), branchID, "")
 	c.JSON(http.StatusOK, models.SuccessResponse("Request accepted successfully", request.ToResponse()))
 }
 
@@ -160,7 +164,8 @@ func (h *RequestHandler) GetRequest(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
 		return
 	}
-	h.trackUserActivity(currentUserID, "", "get", "request", requestID, fmt.Sprintf("قام الموظف %s بالاستعلام عن الطلب رقم %d", username, requestID))
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
+	h.trackUserActivity(currentUserID, username, "get", "request", requestID, "", fmt.Sprintf("قام الموظف %s بالاستعلام عن الطلب رقم %d", username, requestID), branchID, "")
 	c.JSON(http.StatusOK, models.SuccessResponse("Request retrieved", requestDetails))
 }
 
@@ -212,8 +217,20 @@ func (h *RequestHandler) GetRequestBySerial(c *gin.Context) {
 		return
 	}
 
+	// Get user info from context, if available
+	userID, _ := middleware.GetCurrentUserID(c)
+	username, _ := middleware.GetCurrentUsername(c)
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
+	branchName := ""
+	if branchID > 0 {
+		branch, err := h.branchRepo.GetByID(branchID)
+		if err == nil {
+			branchName = branch.Name
+		}
+	}
+
 	// Get request by serial number
-	request, err := h.requestService.GetRequestBySerial(serialNumber)
+	request, err := h.requestService.GetRequestBySerial(serialNumber, userID, username, branchID)
 	if err != nil {
 		if err.Error() == "request not found" || err.Error() == "request not approved" {
 			c.JSON(http.StatusNotFound, models.NotFoundErrorResponse("Request"))
@@ -222,30 +239,7 @@ func (h *RequestHandler) GetRequestBySerial(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
 		return
 	}
-
-
-    // Enrich and record user activity if possible (this is a public endpoint)
-    var actorUserID int64
-    actorUsername := "guest"
-    branchSuffix := ""
-    if uid, ok := c.Get("user_id"); ok {
-        if v, ok2 := uid.(int64); ok2 {
-            actorUserID = v
-        }
-    }
-    if uname, ok := c.Get("username"); ok {
-        if v, ok2 := uname.(string); ok2 && v != "" {
-            actorUsername = v
-        }
-    }
-    if bid, ok := c.Get("branch_id"); ok {
-        if v, ok2 := bid.(int64); ok2 && v > 0 {
-            branchSuffix = fmt.Sprintf(" ???? ??? %d", v)
-        }
-    }
-
-    h.trackUserActivity(actorUserID, actorUsername, "get", "request", request.ID, fmt.Sprintf("??? ???????? %s ?????????? ?? ????? ???????? %s%s", actorUsername, serialNumber, branchSuffix))
-
+	h.trackUserActivity(userID, username, "get_by_serial", "request", request.ID, branchName, fmt.Sprintf("قام الموظف %s بالبحث عن الطلب رقم %d", username, request.ID), branchID, serialNumber)
 	c.JSON(http.StatusOK, models.SuccessResponse("Request retrieved", request.ToResponse()))
 }
 
@@ -510,8 +504,9 @@ func (h *RequestHandler) ApproveRequest(c *gin.Context) {
 		return
 	}
 
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
 	// Track user activity in a background goroutine
-	h.trackUserActivity(userID, username, "approve", "request", requestID, fmt.Sprintf("قام الموظف %s بالموافقة على الطلب رقم %d", username, requestID))
+	h.trackUserActivity(userID, username, "approve", "request", requestID, "", fmt.Sprintf("قام الموظف %s بالموافقة على الطلب رقم %d", username, requestID), branchID, "")
 
 	c.JSON(http.StatusOK, models.SuccessResponse("Request approved successfully", request.ToResponse()))
 }
@@ -538,18 +533,21 @@ type RejectRequestBody struct {
 // @Router /requests/{id}/reject [post]
 
 // trackUserActivity asynchronously creates a user activity record
-func (h *RequestHandler) trackUserActivity(userID int64, username string, action string, module string, entityID int64, description string) {
+func (h *RequestHandler) trackUserActivity(userID int64, username string, action string, module string, entityID int64, entityName string, description string, branchID int64, serialNumber string) {
 	go func() {
 		entityIDPtr := new(int64)
 		*entityIDPtr = entityID
 
 		activity := &models.UserActivities{
-			UserId:      userID,
-			Username:    username,
-			Action:      action,
-			Module:      module,
-			EntityId:    entityIDPtr,
-			Description: description,
+			UserId:       userID,
+			Username:     username,
+			Action:       action,
+			Module:       module,
+			EntityId:     entityIDPtr,
+			EntityName:   entityName,
+			Description:  description,
+			BranchID:     &branchID,
+			SerialNumber: serialNumber,
 		}
 
 		err := h.activityRepo.Create(activity)
@@ -597,8 +595,9 @@ func (h *RequestHandler) RejectRequest(c *gin.Context) {
 		return
 	}
 
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
 	// Track user activity in a background goroutine
-	h.trackUserActivity(userID, username, "reject", "request", requestID, fmt.Sprintf("قام الموظف %s برفض الطلب رقم %d", username, requestID))
+	h.trackUserActivity(userID, username, "reject", "request", requestID, "", fmt.Sprintf("قام الموظف %s برفض الطلب رقم %d", username, requestID), branchID, "")
 
 	c.JSON(http.StatusOK, models.SuccessResponse("Request rejected successfully", request.ToResponse()))
 }
@@ -632,8 +631,9 @@ func (h *RequestHandler) MarkAsPaid(c *gin.Context) {
 		return
 	}
 
+	branchID, _ := middleware.GetCurrentUserBranchID(c)
 	// Track user activity in a background goroutine
-	h.trackUserActivity(userID, username, "mark_paid", "request", requestID, fmt.Sprintf("قام الموظف %s بتعليم الطلب كمدفوع رقم %d", username, requestID))
+	h.trackUserActivity(userID, username, "mark_paid", "request", requestID, "", fmt.Sprintf("قام الموظف %s بتعليم الطلب كمدفوع رقم %d", username, requestID), branchID, "")
 
 	c.JSON(http.StatusOK, models.SuccessResponse("Request marked as paid successfully", request.ToResponse()))
 }
@@ -651,25 +651,25 @@ func (h *RequestHandler) MarkAsPaid(c *gin.Context) {
 // @Failure 500 {object} models.APIResponse
 // @Router /requests/ratio-sum [get]
 func (h *RequestHandler) GetRatioSum(c *gin.Context) {
-	var branchID *int64
-	if branchIDStr := c.Query("branch_id"); branchIDStr != "" {
-		if id, err := strconv.ParseInt(branchIDStr, 10, 64); err == nil {
-			branchID = &id
-		} else {
-			c.JSON(http.StatusBadRequest, models.BadRequestErrorResponse("Invalid branch_id parameter"))
-			return
-		}
-	}
+	//var branchID *int64
+	//if branchIDStr := c.Query("branch_id"); branchIDStr != "" {
+	//	if id, err := strconv.ParseInt(branchIDStr, 10, 64); err == nil {
+	//		branchID = &id
+	//	} else {
+	//		c.JSON(http.StatusBadRequest, models.BadRequestErrorResponse("Invalid branch_id parameter"))
+	//		return
+	//	}
+	//}
 
 	// Get ratio sum based on user permissions
 	// Get ratio sum with optional branch filtering
-	sum, err := h.requestService.GetRatioSumWithBranchFilter(branchID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
-		return
-	}
+	//sum, err := h.requestService.GetRatioSumWithBranchFilter(branchID)
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
+	//	return
+	//}
 	response := map[string]float64{
-		"ratio_sum": sum,
+		"ratio_sum": 0,
 	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse("Ratio sum retrieved successfully", response))
@@ -690,13 +690,13 @@ func (h *RequestHandler) GetRatioSum(c *gin.Context) {
 func (h *RequestHandler) GetRatioSumPerBranch(c *gin.Context) {
 
 	// Get ratio sum per branch
-	ratioSumPerBranch, err := h.requestService.GetRatioSumPerBranch()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
-		return
-	}
+	//ratioSumPerBranch, err := h.requestService.GetRatioSumPerBranch()
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, models.InternalErrorResponse())
+	//	return
+	//}
 
-	c.JSON(http.StatusOK, models.SuccessResponse("Ratio sum per branch retrieved successfully", ratioSumPerBranch))
+	//c.JSON(http.StatusOK, models.SuccessResponse("Ratio sum per branch retrieved successfully", ratioSumPerBranch))
 }
 
 // GetRequestHistory handles getting request history
