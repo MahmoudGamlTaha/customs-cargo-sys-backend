@@ -49,6 +49,7 @@ func main() {
 	// Initialize services
 	userService := service.NewUserService(userRepo, companyRepo, branchRepo, roleRepo, passwordManager, jwtManager)
 	requestService := service.NewRequestService(requestRepo, userRepo, requestTypeRepo)
+	membershipService := service.NewMembershipService()
 	companyService := service.NewCompanyService(companyRepo)
 	branchService := service.NewBranchService(branchRepo)
 	requestTypeService := service.NewRequestTypeService(requestTypeRepo)
@@ -58,6 +59,7 @@ func main() {
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
 	requestHandler := handler.NewRequestHandler(requestService, userActivityRepo, *cfg)
+	membershipHandler := handler.NewMembershipHandler(membershipService)
 	companyHandler := handler.NewCompanyHandler(companyService)
 	branchHandler := handler.NewBranchHandler(branchService)
 	requestTypeHandler := handler.NewRequestTypeHandler(requestTypeService)
@@ -66,7 +68,7 @@ func main() {
 
 	// Setup router
 
-	router := setupRouter(cfg, jwtManager, userService, permissionRepo, userHandler, requestHandler, companyHandler, branchHandler, requestTypeHandler, userActivityHandler, roleHandler)
+	router := setupRouter(cfg, jwtManager, userService, permissionRepo, userHandler, requestHandler, membershipHandler, companyHandler, branchHandler, requestTypeHandler, userActivityHandler, roleHandler)
 
 	// Create server
 	server := &http.Server{
@@ -93,6 +95,7 @@ func setupRouter(
 
 	userHandler *handler.UserHandler,
 	requestHandler *handler.RequestHandler,
+	membershipHandler *handler.MembershipHandler,
 	companyHandler *handler.CompanyHandler,
 	branchHandler *handler.BranchHandler,
 	requestTypeHandler *handler.RequestTypeHandler,
@@ -143,6 +146,9 @@ func setupRouter(
 	// Public request routes (no authentication required)
 	v1.GET("/request/:identifier", requestHandler.GetRequestByIdentifier)
 	v1.GET("/request/serial/:serial", requestHandler.GetRequestBySerial)
+
+	// Public membership routes (no authentication required)
+	v1.GET("/membership/check/:id", membershipHandler.GetMembershipByID)
 
 	// Protected routes (authentication required)
 	protected := v1.Group("")
