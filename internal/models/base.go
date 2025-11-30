@@ -14,6 +14,12 @@ type BaseModel struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at" gorm:"autoUpdateTime"`
 }
 
+type BaseModelDto struct {
+	ID        int64     `json:"id,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+}
+
 type NullString sql.NullString
 
 func (ns NullString) MarshalJSON() ([]byte, error) {
