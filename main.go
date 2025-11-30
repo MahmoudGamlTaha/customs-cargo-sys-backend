@@ -48,7 +48,7 @@ func main() {
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, companyRepo, branchRepo, roleRepo, passwordManager, jwtManager)
-	requestService := service.NewRequestService(requestRepo, userRepo, requestTypeRepo)
+	requestService := service.NewRequestService(requestRepo, userRepo, requestTypeRepo, userActivityRepo, branchRepo)
 	membershipService := service.NewMembershipService()
 	companyService := service.NewCompanyService(companyRepo)
 	branchService := service.NewBranchService(branchRepo)
@@ -144,8 +144,10 @@ func setupRouter(
 	}
 
 	// Public request routes (no authentication required)
-	v1.GET("/request/:identifier", requestHandler.GetRequestByIdentifier)
-	v1.GET("/request/serial/:serial", requestHandler.GetRequestBySerial)
+	publicReq := v1.Group("")
+	publicReq.Use(middleware.OptionalAuth(jwtManager))
+	publicReq.GET("/request/:identifier", requestHandler.GetRequestByIdentifier)
+	publicReq.GET("/request/serial/:serial", requestHandler.GetRequestBySerial)
 
 	// Public membership routes (no authentication required)
 	v1.GET("/membership/check/:id", membershipHandler.GetMembershipByID)

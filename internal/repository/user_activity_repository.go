@@ -19,8 +19,8 @@ func NewUserActivityRepository(db *database.DB) *UserActivityRepository {
 // Create inserts a new user activity record into the database
 func (r *UserActivityRepository) Create(activity *models.UserActivities) error {
 	query := `
-		INSERT INTO user_activities (description, action, user_id, username, module, entity_id)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO user_activities (description, action, user_id, username, module, entity_id, entity_name,branch_id,serial)
+		VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9)
 	`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -35,6 +35,9 @@ func (r *UserActivityRepository) Create(activity *models.UserActivities) error {
 		activity.Username,
 		activity.Module,
 		activity.EntityId,
+		activity.EntityName,
+		activity.BranchID,
+		activity.SerialNumber,
 	)
 	if err != nil {
 		return fmt.Errorf("error executing statement: %w", err)
@@ -55,7 +58,7 @@ func (r *UserActivityRepository) GetAll(pagination models.PaginationParams) ([]*
 
 	// Then get the paginated records
 	query := `
-		SELECT id, description, action, user_id, username, module, entity_id, created_at
+		SELECT id, description, action, user_id, username, module, entity_id, entity_name,branch_id,serial, created_at
 		FROM user_activities
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
@@ -79,6 +82,9 @@ func (r *UserActivityRepository) GetAll(pagination models.PaginationParams) ([]*
 			&activity.Username,
 			&activity.Module,
 			&activity.EntityId,
+			&activity.EntityName,
+			&activity.BranchID,
+			&activity.SerialNumber,
 			&activity.CreatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("error scanning user activity: %w", err)
@@ -110,7 +116,7 @@ func (r *UserActivityRepository) GetAllByBranch(branchID int64, pagination model
 
 	// Then get the paginated records
 	query := `
-		SELECT ua.id, ua.description, ua.action, ua.user_id, ua.username, ua.module, ua.entity_id, ua.created_at
+		SELECT ua.id, ua.description, ua.action, ua.user_id, ua.username, ua.module, ua.entity_id, ua.entity_name,u.branch_id,ua.serial, ua.created_at
 		FROM user_activities ua
 		JOIN users u ON ua.user_id = u.id
 		WHERE u.branch_id = $1
@@ -136,6 +142,9 @@ func (r *UserActivityRepository) GetAllByBranch(branchID int64, pagination model
 			&activity.Username,
 			&activity.Module,
 			&activity.EntityId,
+			&activity.EntityName,
+			&activity.BranchID,
+			&activity.SerialNumber,
 			&activity.CreatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("error scanning user activity: %w", err)
@@ -162,7 +171,7 @@ func (r *UserActivityRepository) GetByUserID(userID int64, pagination models.Pag
 
 	// Then get the paginated records
 	query := `
-		SELECT id, description, action, user_id, username, module, entity_id, created_at
+		SELECT id, description, action, user_id, username, module, entity_id, entity_name, created_at
 		FROM user_activities
 		WHERE user_id = $1
 		ORDER BY created_at DESC
@@ -187,6 +196,7 @@ func (r *UserActivityRepository) GetByUserID(userID int64, pagination models.Pag
 			&activity.Username,
 			&activity.Module,
 			&activity.EntityId,
+			&activity.EntityName,
 			&activity.CreatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("error scanning user activity: %w", err)
@@ -213,7 +223,7 @@ func (r *UserActivityRepository) GetByModuleAndEntityID(module string, entityID 
 
 	// Then get the paginated records
 	query := `
-		SELECT id, description, action, user_id, username, module, entity_id, created_at
+		SELECT id, description, action, user_id, username, module, entity_id, entity_name, created_at
 		FROM user_activities
 		WHERE module = $1 AND entity_id = $2
 		ORDER BY created_at DESC
@@ -238,6 +248,7 @@ func (r *UserActivityRepository) GetByModuleAndEntityID(module string, entityID 
 			&activity.Username,
 			&activity.Module,
 			&activity.EntityId,
+			&activity.EntityName,
 			&activity.CreatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("error scanning user activity: %w", err)
